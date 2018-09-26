@@ -1,0 +1,258 @@
+Bit Manipulation
+Bitwise Operations:
+1. Signs
+<<
+A << B : Move binary expression of A to the left by B bits, and add 0s to the right.
+
+Example: A = 1100 B = 2
+A << B = 110000
+
+
+>> and >>>
+Arithmetic: >> Keep the sign
+Logic:  >>> Does not keep the sign (only meanningful for 32/64 bits)
+Example: 
+      A = 11111111111111111111111110000001 B = 2 
+A >> B =  11111111111111111111111111100000 
+A >>> B = 00111111111111111111111111100000
+
+&
+If both are 1, return 1. Else, return 0.
+
+Example: A = 001010 B = 101100
+
+A & B = 001000
+
+|
+If both are 0, return 0. Else, return 1.
+
+Example: A = 001010 B = 101100
+
+A	B = 101110
+~
+Flip 0 and 1. Example: A = 001010
+
+~A = 110101
+
+^
+If equal, return 0. Else, return 1.
+
+Example: A = 001010 B = 101100
+
+A ^ B = 100110
+
+Tricks
+Trick One - Eliminate last 1 by    x & (x - 1)
+x = 1100
+
+x - 1 = 1011
+
+x & (x - 1) = 1000
+
+Application 1 - Check if n is a power of 2.
+
+
+public boolean isPowerOfTwo(int n ) {
+        return n > 0 && n & (n - 1) == 0;
+    }
+
+Application 2 - Count number of 1s in a 32 bit number
+
+public int countOnes (int n) {
+        int count = 0;
+        while (n != 0) {
+            n = n & (n - 1);
+            count++;
+        }
+        return count;
+    }
+
+Application 3 - Count number of bits need to flip from int A to int B
+public int countOnes (int n) {
+        int count = 0;
+        while (n != 0) {
+            n = n & (n - 1);
+            count++;
+        }
+        return count;
+    }
+    public int numOfBits(int A, int B) {
+        return countOnes(A ^ B);
+    }
+
+
+Trick Two - a ^ b ^ b = a
+Application 1
+Every number in an array appears twice except one, find that number only exist once.
+public int singleNumber(int[] A) {
+        if (A == null || A.length == 0) return -1;
+        int res = 0;
+        for (Integer i : A) {
+            res ^= i;
+        }
+        return res;
+    }
+
+Application 2
+Every number in an array appears three times except one, find that number only exist once.
+
+ public int singleNumber(int[] A) {
+        int ones = 0, twos = 0, threes = 0;
+        for (int i = 0; i < A.length; i++) {
+            threes = twos & A[i];
+            twos |= ones & A[i];
+            ones |= A[i];
+
+            twos = twos & ~threes;
+            ones = ones & ~threes;
+        }
+        return ones;
+    }
+
+
+Application 3
+Two number in an array appear once, others appear twice. Find these two numbers.
+
+We have x, y so the result of ^ operation for all will be x ^ y. We can set one bit in binary of res to be one, and split the array by this “one”. Since x != y, they will have at least one bit being different.
+
+
+public int[] singleNumber(int[] nums) {
+        int[] ret = new int[2];
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            res ^= nums[i];
+        }
+        res &= -res;
+        for (int i = 0; i < nums.length; i++) {
+            if ((nums[i] & res) == 0) {
+                ret[0] ^= nums[i];
+            } else {
+                ret[1] ^= nums[i];
+            }
+        }
+        return ret;
+    }
+
+^ indicated an XOR: (same means 0; different means 1)
+x ^ 0s = x        x & 0s = 0     x | 0s = x
+A ^ 0 = A
+A ^ A = 0
+x ^ 1s = ~x       x & 1s = x     x | 1s = 1s
+x ^ x = 0
+         x & x = x      x | x = x
+
+<<
+A << B : Move binary expression of A to the left by B bits, and add 0s to the right.向左移意味着末尾补0；
+
+Example: A = 1100 B = 2
+A << B = 110000
+
+
+>> and >>>
+Arithmetic: >> Keep the sign
+The Arithmetic right shift essentially divides by two. we shift values to the right but fill in the new bits 
+with the value of the sign bit.
+
+In logic right shift, we shift the bits and put a 0 in the most significant bit; 
+Logic:  >>> Does not keep the sign (only meanningful for 32/64 bits)
+Example: 
+      A = 11111111111111111111111110000001 B = 2 
+A >> B =  11111111111111111111111111100000 
+A >>> B = 00111111111111111111111111100000
+
+A * 2 is equivalent to shifting left by 1;<< 
+A * 4 is equivalent to shifting left by 2;<<
+
+A positive number is represented as itself while a negative number is represented as the two's complement of its absolute
+value(with a 1 in its sign bit to indicate that a negative value).
+
+The binary representation of -K(negative K) as a N-bit number is concat(1,2^(N-1) - K)
+
+so -1 will be 111111111111;
+
+
+Get Bit: This method shifts 1 over  by i bits, creating a value that looks like 00010000. By
+performing an AND with num, we clear all bits other than the bit at bit i; Finally we compare that to 0;
+
+boolean getBit(int num, int i){
+    return ((num & ( 1 << i)) != 0);
+}
+
+if it's 0 , then return false(0); if it's 1 , then return true(1);
+
+Set Bit: shifts 1 over by i bits; By performing an OR with num, only the value at bit i will change. All other bits of the mask are 
+zero and will not affect num;
+
+int setBit(int num, int i ){
+    return num | (1 << i);
+}
+
+
+Clear Bit: 
+11101111 = ~00010000 
+
+1. Clear the ith bit using 11101111 & num; 
+
+int clearBit(int num, int i){
+    int mask = ~(1 << i);
+    return num & mask;
+}
+
+2. Clear all bits from the most significant bit through i (inclusive), we create a mask with a 1at the ith bit(i << i )
+Then we subtract 1 from it; giving us a sequence of 0s followed by i 1s. we then AND our number with this mask to leave just the last
+i bits;
+
+int clearBitMSBthroughI(int num, int i){
+    int mask = ( 1 << i) - 1;
+    return num & mask;
+}
+
+3. Clear all bits from i through 0(inclusive), we take a sequence of all 1s(which is -1) and shift it over by 31 - i bits; 
+we want a logical shift ,so we use >>> oprator. This gives us a sequence of 1s followed by i 0 bits;
+
+int clearBitsIthrough0(int num, int i){
+    int mask = ~(-1 >>> (31 - i ));
+    return num & mask;
+}
+
+
+Update bit:
+to set the ith bit to a value v, we first clear the bit at position i by using a mask that looks like 11101111;
+Then we shift the intended value, v ,left by i bits; 
+int updateBit(int num, int i , boolean bitIs1){
+    int value = bitIs1? 1:0;
+    int mask = ~(1 << i);
+    return (num & mask) | ( value << i);
+}
+
+n & 1 ? 
+
+package com.tutorialspoint;
+
+import java.lang.*;
+
+public class IntegerDemo {
+
+   public static void main(String[] args) {
+
+      int i = 170;
+      System.out.println("Number = " + i);
+
+      /* returns the string representation of the unsigned integer value 
+         represented by the argument in binary (base 2) */
+      System.out.println("Binary = " + Integer.toBinaryString(i));
+
+      // returns the number of one-bits 
+      System.out.println("Number of one bits = " + Integer.bitCount(i));
+
+      /* returns an int value with at most a single one-bit, in the position 
+         of the highest-order ("leftmost") one-bit in the specified int value */ 
+      System.out.println("Highest one bit = " + Integer.highestOneBit(i));
+   }
+}
+
+
+Number = 170
+Binary = 10101010
+Number of one bits = 4
+Highest one bit = 128
