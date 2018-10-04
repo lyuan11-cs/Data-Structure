@@ -66,6 +66,11 @@ collaborate (see also: git help workflows)
    pull       Fetch from and integrate with another repository or a local branch
    push       Update remote refs along with associated objects
 
+How to update the commit:
+git commit --amend + file name
+-> edit the commit in the editor
+-> git push --force
+
 
 Linux Command:
 pwd
@@ -77,4 +82,5 @@ x是删除，i是插入；
 
 esc退出编辑；
 vim 操作;
+
 
